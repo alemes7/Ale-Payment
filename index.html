@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alexandre Lemes — Client Portal</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ░░░ TOP SYSTEM BAR ░░░ -->
+  <div class="sysbar">
+    <span class="sysbar-item"><span class="sysbar-label">CLIENT ID</span> CLP-2026-01</span>
+    <span class="sysbar-divider">|</span>
+    <span class="sysbar-item"><span class="sysbar-label">STATUS</span> <span class="sysbar-status" id="sysbarStatus">Pending Payment</span></span>
+    <span class="sysbar-divider">|</span>
+    <span class="sysbar-item"><span class="sysbar-label">GENERATED</span> 2026 Project Portal</span>
+  </div>
+
+  <!-- ░░░ HEADER ░░░ -->
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-mark">AL</span>
+      <span class="logo-text">Alexandre Lemes <em>Client Portal</em></span>
+    </div>
+    <button class="logout-btn" id="logoutBtn" style="display:none" onclick="handleLogout()">Logout</button>
+  </header>
+
+  <!-- ░░░ LOGIN SCREEN ░░░ -->
+  <section class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-glyph">⬡</div>
+      <h1 class="login-title">Secure Access</h1>
+      <p class="login-sub">Enter your credentials to access the project portal.</p>
+      <div class="field-group">
+        <label class="field-label" for="inputClientId">Client ID</label>
+        <input class="field-input" id="inputClientId" type="text" placeholder="CLP-0000-00" autocomplete="off" />
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="inputCode">Access Code</label>
+        <input class="field-input" id="inputCode" type="password" placeholder="••••••••••••" autocomplete="off" />
+      </div>
+      <p class="login-error" id="loginError"></p>
+      <button class="btn-primary full-width" onclick="handleLogin()">Access Portal</button>
+    </div>
+  </section>
+
+  <!-- ░░░ DASHBOARD ░░░ -->
+  <main class="dashboard" id="dashboard" style="display:none">
+
+    <!-- Dashboard Header -->
+    <div class="dash-hero">
+      <div class="dash-hero-label">Client Project Dashboard</div>
+      <h2 class="dash-hero-title">Corrida da Padroeira 2026</h2>
+      <p class="dash-hero-sub">📍 Campo Limpo Paulista</p>
+    </div>
+
+    <div class="dash-grid">
+
+      <!-- ── STATUS CARD ── -->
+      <div class="card card-status">
+        <div class="card-header">
+          <span class="card-icon">◈</span>
+          <span class="card-title">Project Status</span>
+        </div>
+        <div class="status-row">
+          <div class="status-pill" id="statusPill">In Development</div>
+        </div>
+        <div class="stat-list">
+          <div class="stat-item">
+            <span class="stat-label">Project Value</span>
+            <span class="stat-value">R$200</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Initial Payment Required</span>
+            <span class="stat-value highlight">R$100</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── COUNTDOWN ── -->
+      <div class="card card-countdown">
+        <div class="card-header">
+          <span class="card-icon">⏱</span>
+          <span class="card-title">Project reservation time remaining</span>
+        </div>
+        <div class="countdown-display">
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cdHours">00</span>
+            <span class="countdown-label">Hours</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cdMins">00</span>
+            <span class="countdown-label">Minutes</span>
+          </div>
+          <span class="countdown-sep">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cdSecs">00</span>
+            <span class="countdown-label">Seconds</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROGRESS ── -->
+      <div class="card card-progress">
+        <div class="card-header">
+          <span class="card-icon">▸</span>
+          <span class="card-title">Project Progress</span>
+        </div>
+        <div class="progress-pct" id="progressPct">30%</div>
+        <div class="progress-track">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+
+      <!-- ── DELIVERABLES ── -->
+      <div class="card card-deliverables">
+        <div class="card-header">
+          <span class="card-icon">✦</span>
+          <span class="card-title">Deliverables</span>
+        </div>
+        <ul class="deliverables-list">
+          <li class="deliverable-item">
+            <span class="del-badge badge-inprogress">In Progress</span>
+            <span class="del-name">Running shirt design</span>
+          </li>
+          <li class="deliverable-item">
+            <span class="del-badge badge-pending">Pending</span>
+            <span class="del-name">Visual identity concept</span>
+          </li>
+          <li class="deliverable-item">
+            <span class="del-badge badge-pending">Pending</span>
+            <span class="del-name">Presentation media</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- ── PAYMENT ── -->
+      <div class="card card-payment">
+        <div class="card-header">
+          <span class="card-icon">◎</span>
+          <span class="card-title">Payment</span>
+        </div>
+        <div class="payment-unlocked" id="paymentUnlocked" style="display:none">
+          <div class="unlocked-badge">✔ Payment Approved — Project Unlocked</div>
+        </div>
+        <div class="payment-actions" id="paymentActions">
+          <p class="payment-info">Make the initial payment of <strong>R$100</strong> via PIX to unlock the project and begin development.</p>
+          <button class="btn-primary" onclick="openPaymentModal()">Unlock Project</button>
+        </div>
+      </div>
+
+      <!-- ── FILES ── -->
+      <div class="card card-files">
+        <div class="card-header">
+          <span class="card-icon">⊟</span>
+          <span class="card-title">Project Files</span>
+        </div>
+        <ul class="files-list">
+          <li class="file-item" id="fileItem1">
+            <span class="file-icon">🖼</span>
+            <span class="file-name">shirt-concept-v1.png</span>
+            <span class="file-lock" id="fileLock1">🔒</span>
+          </li>
+          <li class="file-item" id="fileItem2">
+            <span class="file-icon">📄</span>
+            <span class="file-name">presentation-v1.pdf</span>
+            <span class="file-lock" id="fileLock2">🔒</span>
+          </li>
+        </ul>
+        <p class="files-note" id="filesNote">Files will be available after payment verification.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ░░░ PAYMENT MODAL ░░░ -->
+  <div class="modal-overlay" id="paymentModal" onclick="closeModalOutside(event)">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closePaymentModal()">✕</button>
+
+      <div class="modal-step" id="modalStep1">
+        <div class="modal-icon">◎</div>
+        <h3 class="modal-title">PIX Payment</h3>
+        <div class="pix-details">
+          <div class="pix-row"><span class="pix-label">Recipient</span><span class="pix-val">Alexandre Lemes</span></div>
+          <div class="pix-row"><span class="pix-label">Amount</span><span class="pix-val pix-amount">R$100</span></div>
+          <div class="pix-row"><span class="pix-label">Reference</span><span class="pix-val">CLP-2026-01</span></div>
+        </div>
+        <button class="btn-primary full-width" onclick="showStep2()">I have completed the payment</button>
+      </div>
+
+      <div class="modal-step" id="modalStep2" style="display:none">
+        <div class="modal-icon">⏳</div>
+        <h3 class="modal-title">Payment Under Verification</h3>
+        <p class="modal-sub">Estimated verification time: <strong>30 minutes</strong></p>
+        <p class="modal-sub">If you have a verification code, enter it below to unlock immediately.</p>
+        <div class="field-group">
+          <label class="field-label" for="verifyInput">Verification Code</label>
+          <input class="field-input" id="verifyInput" type="text" placeholder="CLP-0000-XX" autocomplete="off" />
+        </div>
+        <p class="verify-error" id="verifyError"></p>
+        <button class="btn-primary full-width" onclick="handleVerification()">Verify Code</button>
+      </div>
+
+      <div class="modal-step" id="modalStep3" style="display:none">
+        <div class="modal-icon approved">✔</div>
+        <h3 class="modal-title">Payment Approved</h3>
+        <p class="modal-sub">Project Unlocked. Thank you!</p>
+        <button class="btn-primary full-width" onclick="closeAndUnlock()">Go to Dashboard</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
