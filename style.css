@@ -3,7 +3,7 @@
    style.css
 ═══════════════════════════════════════════ */
 
-/* ── TOKENS ── */
+/* ── TOKENS — DARK (default) ── */
 :root {
   --bg-base:       #080c10;
   --bg-surface:    #0d1117;
@@ -33,6 +33,29 @@
   --radius-lg:  18px;
 }
 
+/* ── TOKENS — LIGHT ── */
+body.theme-light {
+  --bg-base:       #f0f4f8;
+  --bg-surface:    #ffffff;
+  --bg-card:       #ffffff;
+  --bg-card-hover: #f7fafd;
+  --border:        #d1dde8;
+  --border-bright: #b0c4d8;
+
+  --text-primary:  #0d1a26;
+  --text-secondary:#4a6a85;
+  --text-muted:    #8aa4ba;
+
+  --accent:        #007db8;
+  --accent-dim:    rgba(0, 125, 184, 0.1);
+  --accent-glow:   rgba(0, 125, 184, 0.2);
+  --green:         #00956a;
+  --green-dim:     rgba(0, 149, 106, 0.1);
+  --amber:         #c47d00;
+  --amber-dim:     rgba(196, 125, 0, 0.1);
+  --red:           #d93050;
+}
+
 /* ── RESET & BASE ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -59,6 +82,7 @@ body::before {
   z-index: 0;
   opacity: 0.6;
 }
+body.theme-light::before { opacity: 0.15; }
 
 /* ── SYSTEM BAR ── */
 .sysbar {
@@ -77,6 +101,9 @@ body::before {
   letter-spacing: 0.08em;
   color: var(--text-muted);
   flex-wrap: wrap;
+}
+body.theme-light .sysbar {
+  background: rgba(240, 244, 248, 0.95);
 }
 .sysbar-label {
   color: var(--text-muted);
@@ -97,6 +124,9 @@ body::before {
   border-bottom: 1px solid var(--border);
   background: rgba(13, 17, 23, 0.7);
   backdrop-filter: blur(8px);
+}
+body.theme-light .site-header {
+  background: rgba(255, 255, 255, 0.85);
 }
 .logo {
   display: flex;
@@ -134,19 +164,27 @@ body::before {
   line-height: 1.1;
 }
 
-.logout-btn {
+/* ── HEADER CONTROLS ── */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ctrl-btn {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.06em;
   color: var(--text-secondary);
   background: transparent;
   border: 1px solid var(--border-bright);
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  white-space: nowrap;
 }
-.logout-btn:hover { color: var(--red); border-color: var(--red); }
+.ctrl-btn:hover { color: var(--accent); border-color: var(--accent); }
+.ctrl-btn--logout:hover { color: var(--red); border-color: var(--red); }
 
 /* ── BUTTONS ── */
 .btn-primary {
@@ -621,6 +659,66 @@ body::before {
   font-size: 12px;
   min-height: 18px;
   margin-bottom: 12px;
+}
+
+/* ── READONLY FIELD ── */
+.field-input--readonly {
+  opacity: 0.65;
+  cursor: not-allowed;
+  border-style: dashed;
+}
+.field-input--readonly:focus {
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+/* ── WHATSAPP BUTTON ── */
+.btn-whatsapp {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #25d366;
+  background: rgba(37, 211, 102, 0.08);
+  border: 1px solid rgba(37, 211, 102, 0.3);
+  padding: 11px 20px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s, border-color 0.2s;
+  text-align: center;
+}
+.btn-whatsapp:hover {
+  background: rgba(37, 211, 102, 0.15);
+  border-color: rgba(37, 211, 102, 0.6);
+}
+
+/* ── DELIVERY INFO (post-unlock countdown card) ── */
+.delivery-info { text-align: center; padding: 12px 0; }
+.delivery-text {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.delivery-days {
+  font-family: var(--font-display);
+  font-size: clamp(44px, 8vw, 72px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--green);
+  line-height: 1;
+  text-shadow: 0 0 30px rgba(0,229,160,0.3);
+}
+.delivery-days span {
+  font-size: 0.35em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-left: 4px;
+  vertical-align: middle;
 }
 
 /* ── SCROLLBAR ── */
