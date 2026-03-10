@@ -11,6 +11,7 @@ const VERIFY_CODE       = 'CLP-2026-OK';
 const COUNTDOWN_HOURS   = 23;
 const COUNTDOWN_MINUTES = 59;
 const COUNTDOWN_SECONDS = 0;
+const DELIVERY_DAYS     = 7;                // estimated delivery after unlock (in days)
 const WHATSAPP_NUMBER   = '5511950702678'; // ← replace with real number
 const WHATSAPP_MESSAGE  = 'Hello Alexandre, I completed the payment for the Corrida da Padroeira project and I need the verification code.';
 // ─────────────────────────────────────────────────────────────
@@ -44,6 +45,8 @@ const i18n = {
     cdMins:           'Minutes',
     cdSecs:           'Seconds',
     deliveryText:     'Estimated completion time',
+    deliveryDate:     'Delivery Date',
+    deliveryDateLabel: 'Delivery Date',
     deliveryDays:     'days',
     cardProgress:     'Project Progress',
     cardDeliverables: 'Deliverables',
@@ -108,6 +111,8 @@ const i18n = {
     cdSecs:           'Segundos',
     deliveryText:     'Prazo estimado de conclusão',
     deliveryDays:     'dias',
+    deliveryDateLabel: 'Data de Entrega',
+    deliveryDate:     'Data de Entrega',
     cardProgress:     'Progresso do Projeto',
     cardDeliverables: 'Entregas',
     badgeInProgress:  'Em Andamento',
@@ -240,11 +245,17 @@ function applyLang(lang) {
     if (countdownTitle) countdownTitle.textContent = t.cardDelivery;
     const daysSpan = document.querySelector('.delivery-days span');
     if (daysSpan) daysSpan.textContent = t.deliveryDays;
-    const deliveryText = document.querySelector('.delivery-text');
+    // only update the element meant for the estimated time (use data-i18n selector)
+    const deliveryText = document.querySelector('[data-i18n="deliveryText"]');
     if (deliveryText) deliveryText.textContent = t.deliveryText;
   }
 
   document.documentElement.lang = lang;
+
+  // if the project is already unlocked we may need to re‑format the delivery info
+  if (localStorage.getItem('projectUnlocked') === 'true') {
+    updateDeliveryInfo();
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -377,6 +388,38 @@ function openWhatsApp() {
   window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + msg, '_blank');
 }
 
+
+function formatDate(timestamp) {
+  // return a locale‑aware day/month/year string
+  const opts = { day: '2-digit', month: '2-digit', year: 'numeric' };
+  const locale = currentLang === 'en' ? 'en-GB' : 'pt-BR';
+  return new Date(timestamp).toLocaleDateString(locale, opts);
+}
+
+function updateDeliveryInfo() {
+  // ensure we have a stored delivery timestamp
+  let deliveryEnd = parseInt(localStorage.getItem('deliveryEnd') || '0', 10);
+  if (!deliveryEnd) {
+    deliveryEnd = Date.now() + DELIVERY_DAYS * 24 * 3600 * 1000;
+    localStorage.setItem('deliveryEnd', deliveryEnd);
+  }
+
+  const now = Date.now();
+  const remainingMs = deliveryEnd - now;
+  const daysRemaining = remainingMs > 0 ? Math.ceil(remainingMs / (24 * 3600 * 1000)) : 0;
+
+  const daysDiv = document.querySelector('.delivery-days');
+  if (daysDiv) {
+    const label = daysDiv.querySelector('span');
+    daysDiv.innerHTML = daysRemaining + (label ? ' ' + label.outerHTML : '');
+  }
+
+  const dateEl = document.getElementById('deliveryDateValue');
+  if (dateEl) {
+    dateEl.textContent = formatDate(deliveryEnd);
+  }
+}
+
 /* ══════════════════════════════════════════
    APPLY UNLOCKED STATE
 ══════════════════════════════════════════ */
@@ -401,6 +444,9 @@ function applyUnlockedState(animate) {
   if (daysSpan) daysSpan.textContent = t.deliveryDays;
   const deliveryText = document.querySelector('.delivery-text');
   if (deliveryText) deliveryText.textContent = t.deliveryText;
+
+  // compute & display actual delivery info (days left + date)
+  updateDeliveryInfo();
 
   // Payment section
   document.getElementById('paymentActions').style.display  = 'none';
