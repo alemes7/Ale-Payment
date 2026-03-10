@@ -12,7 +12,7 @@ const COUNTDOWN_HOURS   = 23;
 const COUNTDOWN_MINUTES = 59;
 const COUNTDOWN_SECONDS = 0;
 const DELIVERY_DAYS     = 7;  // days until estimated delivery after unlock
-const WHATSAPP_NUMBER   = '5511999999999'; // ← replace with real number
+const WHATSAPP_NUMBER   = '5511950702678'; // ← replace with real number
 const WHATSAPP_MESSAGE  = 'Hello Alexandre, I completed the payment for the Corrida da Padroeira project and I need the verification code.';
 // ─────────────────────────────────────────────────────────────
 
