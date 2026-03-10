@@ -4,15 +4,15 @@
 ═══════════════════════════════════════════ */
 
 // ── EASY-EDIT VARIABLES ──────────────────────────────────────
-const projectProgress   = 25;            // 0–100
+const projectProgress   = 30;            // 0–100
 const VALID_CLIENT_ID   = 'CLP-2026-01';
 const VALID_ACCESS_CODE = 'PADROEIRA2026';
 const VERIFY_CODE       = 'CLP-2026-OK';
 const COUNTDOWN_HOURS   = 23;
 const COUNTDOWN_MINUTES = 59;
 const COUNTDOWN_SECONDS = 0;
-const DELIVERY_DAYS     = 7;                // estimated delivery after unlock (in days)
-const WHATSAPP_NUMBER   = '5511950702678'; // ← replace with real number
+const DELIVERY_DAYS     = 7;  // days until estimated delivery after unlock
+const WHATSAPP_NUMBER   = '5511999999999'; // ← replace with real number
 const WHATSAPP_MESSAGE  = 'Hello Alexandre, I completed the payment for the Corrida da Padroeira project and I need the verification code.';
 // ─────────────────────────────────────────────────────────────
 
@@ -45,8 +45,7 @@ const i18n = {
     cdMins:           'Minutes',
     cdSecs:           'Seconds',
     deliveryText:     'Estimated completion time',
-    deliveryDate:     'Delivery Date',
-    deliveryDateLabel: 'Delivery Date',
+    deliveryDateLabel:'Delivery Date',
     deliveryDays:     'days',
     cardProgress:     'Project Progress',
     cardDeliverables: 'Deliverables',
@@ -64,9 +63,7 @@ const i18n = {
     filesLocked:      'Files will be available after payment verification.',
     filesUnlocked:    'Files available for download.',
     modalPixTitle:    'PIX Payment',
-    modalPixsubtitle: 'Key PIX is Email-Based',
     pixRecipient:     'Recipient',
-    pixEmail:         'Email',
     pixAmount:        'Amount',
     pixRef:           'Reference',
     btnPayDone:       'I have completed the payment',
@@ -110,9 +107,8 @@ const i18n = {
     cdMins:           'Minutos',
     cdSecs:           'Segundos',
     deliveryText:     'Prazo estimado de conclusão',
+    deliveryDateLabel:'Data de Entrega',
     deliveryDays:     'dias',
-    deliveryDateLabel: 'Data de Entrega',
-    deliveryDate:     'Data de Entrega',
     cardProgress:     'Progresso do Projeto',
     cardDeliverables: 'Entregas',
     badgeInProgress:  'Em Andamento',
@@ -129,9 +125,7 @@ const i18n = {
     filesLocked:      'Os arquivos estarão disponíveis após a verificação do pagamento.',
     filesUnlocked:    'Arquivos disponíveis para download.',
     modalPixTitle:    'Pagamento PIX',
-    modalPixsubtitle: 'Chave PIX é o Email',
     pixRecipient:     'Destinatário',
-    pixEmail:         'Email',
     pixAmount:        'Valor',
     pixRef:           'Referência',
     btnPayDone:       'Já realizei o pagamento',
@@ -245,14 +239,13 @@ function applyLang(lang) {
     if (countdownTitle) countdownTitle.textContent = t.cardDelivery;
     const daysSpan = document.querySelector('.delivery-days span');
     if (daysSpan) daysSpan.textContent = t.deliveryDays;
-    // only update the element meant for the estimated time (use data-i18n selector)
-    const deliveryText = document.querySelector('[data-i18n="deliveryText"]');
+    const deliveryText = document.querySelector('.delivery-text');
     if (deliveryText) deliveryText.textContent = t.deliveryText;
   }
 
   document.documentElement.lang = lang;
 
-  // if the project is already unlocked we may need to re‑format the delivery info
+  // Re-format delivery date in the new locale if already unlocked
   if (localStorage.getItem('projectUnlocked') === 'true') {
     updateDeliveryInfo();
   }
@@ -293,24 +286,6 @@ document.getElementById('inputCode').addEventListener('keydown', e => {
 /* ══════════════════════════════════════════
    DASHBOARD
 ══════════════════════════════════════════ */
-function updateFileLinks(unlocked) {
-  ['1','2','3','4'].forEach(n => {
-    const link = document.getElementById('fileLink' + n);
-    if (link) {
-      if (unlocked) {
-        const file = link.getAttribute('data-file');
-        link.href = file;
-        link.setAttribute('download', '');
-        link.style.pointerEvents = 'auto';
-      } else {
-        link.removeAttribute('href');
-        link.removeAttribute('download');
-        link.style.pointerEvents = 'none';
-      }
-    }
-  });
-}
-
 function showDashboard(unlocked) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display   = 'block';
@@ -321,9 +296,6 @@ function showDashboard(unlocked) {
   setTimeout(() => {
     document.getElementById('progressBar').style.width = pct + '%';
   }, 200);
-
-  // make sure file links are correct according to state
-  updateFileLinks(unlocked);
 
   if (unlocked) {
     applyUnlockedState(false);
@@ -396,6 +368,11 @@ document.getElementById('verifyInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') handleVerification();
 });
 
+// Close preview modal on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeFilePreview();
+});
+
 function closeAndUnlock() {
   closePaymentModal();
   applyUnlockedState(true);
@@ -409,36 +386,37 @@ function openWhatsApp() {
   window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + msg, '_blank');
 }
 
-
+/* ══════════════════════════════════════════
+   DELIVERY DATE HELPERS
+══════════════════════════════════════════ */
 function formatDate(timestamp) {
-  // return a locale‑aware day/month/year string
-  const opts = { day: '2-digit', month: '2-digit', year: 'numeric' };
-  const locale = currentLang === 'en' ? 'en-GB' : 'pt-BR';
+  const opts = { day: 'numeric', month: 'long', year: 'numeric' };
+  const locale = currentLang === 'pt' ? 'pt-BR' : 'en-US';
   return new Date(timestamp).toLocaleDateString(locale, opts);
 }
 
 function updateDeliveryInfo() {
-  // ensure we have a stored delivery timestamp
+  // Persist delivery end timestamp so it survives page refreshes
   let deliveryEnd = parseInt(localStorage.getItem('deliveryEnd') || '0', 10);
   if (!deliveryEnd) {
     deliveryEnd = Date.now() + DELIVERY_DAYS * 24 * 3600 * 1000;
     localStorage.setItem('deliveryEnd', deliveryEnd);
   }
 
-  const now = Date.now();
-  const remainingMs = deliveryEnd - now;
-  const daysRemaining = remainingMs > 0 ? Math.ceil(remainingMs / (24 * 3600 * 1000)) : 0;
+  const now          = Date.now();
+  const remainingMs  = deliveryEnd - now;
+  const daysLeft     = remainingMs > 0 ? Math.ceil(remainingMs / (24 * 3600 * 1000)) : 0;
 
-  const daysDiv = document.querySelector('.delivery-days');
+  // Update the big day number (keep the inner <span> for the label)
+  const daysDiv = document.getElementById('deliveryDaysNum');
   if (daysDiv) {
-    const label = daysDiv.querySelector('span');
-    daysDiv.innerHTML = daysRemaining + (label ? ' ' + label.outerHTML : '');
+    const labelSpan = daysDiv.querySelector('span');
+    daysDiv.innerHTML = daysLeft + (labelSpan ? ' ' + labelSpan.outerHTML : '');
   }
 
+  // Update the formatted date string
   const dateEl = document.getElementById('deliveryDateValue');
-  if (dateEl) {
-    dateEl.textContent = formatDate(deliveryEnd);
-  }
+  if (dateEl) dateEl.textContent = formatDate(deliveryEnd);
 }
 
 /* ══════════════════════════════════════════
@@ -466,7 +444,7 @@ function applyUnlockedState(animate) {
   const deliveryText = document.querySelector('.delivery-text');
   if (deliveryText) deliveryText.textContent = t.deliveryText;
 
-  // compute & display actual delivery info (days left + date)
+  // Compute days remaining and formatted date
   updateDeliveryInfo();
 
   // Payment section
@@ -485,9 +463,9 @@ function applyUnlockedState(animate) {
   const filesNote = document.getElementById('filesNote');
   if (filesNote) filesNote.textContent = t.filesUnlocked;
 
-  ['1', '2', '3', '4'].forEach(n => {
+  ['3', '4'].forEach(n => {
     const lockEl = document.getElementById('fileLock' + n);
-    if (lockEl) lockEl.textContent = '⬇';
+    if (lockEl) lockEl.textContent = '👁';
     const item = document.getElementById('fileItem' + n);
     if (item) {
       item.classList.add('unlocked-file');
@@ -495,10 +473,9 @@ function applyUnlockedState(animate) {
       const nameEl = item.querySelector('.file-name');
       if (nameEl) nameEl.style.color = 'var(--text-primary)';
     }
+    const labelEl = document.getElementById('filePreviewLabel' + n);
+    if (labelEl) labelEl.textContent = 'Preview';
   });
-
-  // enable download links now that project is unlocked
-  updateFileLinks(true);
 
   if (animate) {
     const dash = document.getElementById('dashboard');
@@ -506,6 +483,36 @@ function applyUnlockedState(animate) {
     dash.style.opacity = '0.6';
     setTimeout(() => { dash.style.opacity = '1'; }, 300);
   }
+}
+
+/* ══════════════════════════════════════════
+   FILE PREVIEW
+══════════════════════════════════════════ */
+function handleFileClick(fileName) {
+  const unlocked = localStorage.getItem('projectUnlocked') === 'true';
+  if (!unlocked) return; // locked — do nothing
+  openFilePreview(fileName);
+}
+
+function openFilePreview(fileName) {
+  document.getElementById('previewFilename').textContent = fileName;
+  const img = document.getElementById('previewImg');
+  img.src = fileName;
+  img.alt = fileName;
+  document.getElementById('filePreviewModal').classList.add('open');
+}
+
+function closeFilePreview() {
+  document.getElementById('filePreviewModal').classList.remove('open');
+  // clear src after close to avoid stale image flash
+  setTimeout(() => {
+    const img = document.getElementById('previewImg');
+    if (img) img.src = '';
+  }, 300);
+}
+
+function closePreviewOutside(e) {
+  if (e.target === document.getElementById('filePreviewModal')) closeFilePreview();
 }
 
 /* ══════════════════════════════════════════

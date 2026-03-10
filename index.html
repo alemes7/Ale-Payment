@@ -109,10 +109,10 @@
         </div>
         <div class="delivery-info" id="deliveryInfo" style="display:none">
           <p class="delivery-text" data-i18n="deliveryText">Estimated completion time</p>
-          <div class="delivery-days">7 <span data-i18n="deliveryDays">days</span></div>
-          <br>
-          <p class="delivery-text">
-            <span data-i18n="deliveryDateLabel">Delivery Date</span>: <span id="deliveryDateValue">17/03/2026</span>
+          <div class="delivery-days" id="deliveryDaysNum">7 <span data-i18n="deliveryDays">days</span></div>
+          <p class="delivery-date-row">
+            <span class="delivery-date-label" data-i18n="deliveryDateLabel">Delivery Date</span>
+            <span class="delivery-date-value" id="deliveryDateValue">—</span>
           </p>
         </div>
       </div>
@@ -123,7 +123,7 @@
           <span class="card-icon">▸</span>
           <span class="card-title" data-i18n="cardProgress">Project Progress</span>
         </div>
-        <div class="progress-pct" id="progressPct">25%</div>
+        <div class="progress-pct" id="progressPct">30%</div>
         <div class="progress-track">
           <div class="progress-bar" id="progressBar"></div>
         </div>
@@ -173,14 +173,14 @@
           <span class="card-title" data-i18n="cardFiles">Project Files</span>
         </div>
         <ul class="files-list">
-          <li class="file-item" id="fileItem3">
+          <li class="file-item" id="fileItem3" onclick="handleFileClick('camisaazul.png')">
             <span class="file-icon">👕</span>
-            <a class="file-name" id="fileLink3" href="CamisaAzul.png" data-file="camisaazul.png">camisaazul.png</a>
+            <span class="file-name">camisaazul.png <span class="file-preview-label" id="filePreviewLabel3"></span></span>
             <span class="file-lock" id="fileLock3">🔒</span>
           </li>
-          <li class="file-item" id="fileItem4">
+          <li class="file-item" id="fileItem4" onclick="handleFileClick('camisaverde.png')">
             <span class="file-icon">👕</span>
-            <a class="file-name" id="fileLink4" href="CamisaVerde.png" data-file="camisaverde.png">camisaverde.png</a>
+            <span class="file-name">camisaverde.png <span class="file-preview-label" id="filePreviewLabel4"></span></span>
             <span class="file-lock" id="fileLock4">🔒</span>
           </li>
         </ul>
@@ -189,6 +189,17 @@
 
     </div>
   </main>
+
+  <!-- ░░░ FILE PREVIEW MODAL ░░░ -->
+  <div class="modal-overlay" id="filePreviewModal" onclick="closePreviewOutside(event)">
+    <div class="preview-card">
+      <button class="modal-close" onclick="closeFilePreview()">✕</button>
+      <p class="preview-filename" id="previewFilename"></p>
+      <div class="preview-img-wrap">
+        <img class="preview-img" id="previewImg" src="" alt="" />
+      </div>
+    </div>
+  </div>
 
   <!-- ░░░ PAYMENT MODAL ░░░ -->
   <div class="modal-overlay" id="paymentModal" onclick="closeModalOutside(event)">
