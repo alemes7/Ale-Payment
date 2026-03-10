@@ -4,7 +4,7 @@
 ═══════════════════════════════════════════ */
 
 // ── EASY-EDIT VARIABLES ──────────────────────────────────────
-const projectProgress   = 10;            // 0–100
+const projectProgress   = 25;            // 0–100
 const VALID_CLIENT_ID   = 'CLP-2026-01';
 const VALID_ACCESS_CODE = 'PADROEIRA2026';
 const VERIFY_CODE       = 'CLP-2026-OK';
@@ -293,6 +293,24 @@ document.getElementById('inputCode').addEventListener('keydown', e => {
 /* ══════════════════════════════════════════
    DASHBOARD
 ══════════════════════════════════════════ */
+function updateFileLinks(unlocked) {
+  ['1','2','3','4'].forEach(n => {
+    const link = document.getElementById('fileLink' + n);
+    if (link) {
+      if (unlocked) {
+        const file = link.getAttribute('data-file');
+        link.href = file;
+        link.setAttribute('download', '');
+        link.style.pointerEvents = 'auto';
+      } else {
+        link.removeAttribute('href');
+        link.removeAttribute('download');
+        link.style.pointerEvents = 'none';
+      }
+    }
+  });
+}
+
 function showDashboard(unlocked) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display   = 'block';
@@ -303,6 +321,9 @@ function showDashboard(unlocked) {
   setTimeout(() => {
     document.getElementById('progressBar').style.width = pct + '%';
   }, 200);
+
+  // make sure file links are correct according to state
+  updateFileLinks(unlocked);
 
   if (unlocked) {
     applyUnlockedState(false);
@@ -464,7 +485,7 @@ function applyUnlockedState(animate) {
   const filesNote = document.getElementById('filesNote');
   if (filesNote) filesNote.textContent = t.filesUnlocked;
 
-  ['1', '2'].forEach(n => {
+  ['1', '2', '3', '4'].forEach(n => {
     const lockEl = document.getElementById('fileLock' + n);
     if (lockEl) lockEl.textContent = '⬇';
     const item = document.getElementById('fileItem' + n);
@@ -475,6 +496,9 @@ function applyUnlockedState(animate) {
       if (nameEl) nameEl.style.color = 'var(--text-primary)';
     }
   });
+
+  // enable download links now that project is unlocked
+  updateFileLinks(true);
 
   if (animate) {
     const dash = document.getElementById('dashboard');
